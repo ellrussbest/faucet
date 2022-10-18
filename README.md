@@ -1,70 +1,95 @@
-# Getting Started with Create React App
+# npm packages
+- web3 - web3js api
+- @metamask/detect-provider -> utility to help detect the provider
+- @truffle/contract -> creates contract abstraction
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# commands
+- truffle init -> used to initialize the truffle and create truffle-config.js file
+- truffle migrate -> used to migrate the contract
+- truffle migrate --reset -> used when you want to remigrate your contract
+- truffle compile -> used to compile the project
+- truffle console -> to open the truffle console
+    - on the truffle console you can write normal javascript code e.g. `const instance = await ContractName.deployed()`
+    - `accounts` -> gives you a list of accounts
+    - all public variables will have a getter function by default e.g. `const publicVariable = await instance.publicVariable()` or `const methodName = await instance.methodName()`
+    - to convert BN type to string you use the toString() method
+    - accessing the contract using web3js api in truffle is as follows: `const instance = new web3.eth.Contract(contractName.abi, "addressOfContract")`
+    - accessing a particular method using web3js: `let methodName = await instance.methods.methodName().call()`
+    - making transactions using web3: `web3.eth.sendTransaction({from: account, to: account, value: value})`
+    - `web3.eth.getBlock("blockNumber")`
+    - `web3.eth.getCode("contractAddress")` -> getting the byte code.
+    - `web3.eth.sendTransaction({from: "accountAddress", to: "accountAddress", value: "value in wei", data: "function signature" })` -> you can execute a function through sending its signature in a transaction. This funcition will only work if it is payable
+    - To access the slots in your contract storage: `web3.eth.getStorageAt("contractAddress", slotIndex)`
 
-## Available Scripts
+# general knowledge
+- tx fees = gas price * gas limit
+- keccak gives an output of 32bytes in base16(hexadecimal) format
+- getting the function signature:-
+    - let us say we have a function called setCompleted(uint256 completed) we will hash using keccak setCompleted(uint256)
+    - the first 4 bytes on the hashing result will represent the function signature e.g. in our case, fdacd576
+    - the rest 32 bytes represent the input parameters of the function in base15 (hexadecimal)
+- To know more about the blocks you can visit eth hash
+- rlp (recursive length prefix) - the serialization used in ethereum
+- you can use JSON RPC calls to interact with your smart contract
+- codes wrapped in assembly block code are low level codes e.g.
+```
+function test(uint testNum) external pure returns (uint data) {
+    assembly {
+        // instantiating a variable
+        // instantiated memory will first be stored on the stack
+        let _num := 4
 
-In the project directory, you can run:
+        // loading free memory pointer from address 0x40
+        let _fmp := mload(0x40)
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+        // on the free memory pointer, store address 0x90
+        mstore(0x40, 0x90)
+    }
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    uint8[3] memory items = [1, 2, 3];
+    // the value 1 in the array will be stored 32 bytes offset of the 0x90 memory address
 
-### `npm test`
+    // returning using assembly
+    assembly {
+        // on the variable data,
+        // load the sum of address 90 and the value 
+        // of 32 bytes offset i.e. it will return 
+        // sum of 1 and 2 which is 3
+        data := mload(add(0x90, 0x20))
+    }
+}
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+function test2() external pure returns (uint data) {
+    assembly {
+        // variable fmp will store address 0x40
+        let fmp := mload(0x40)
+        // we want to store string hello
+        // convert hello text to binary
+        // convert the binary to hex
+        // hello in hex is 0x68656C6C6F
 
-### `npm run build`
+        // at the address stored in fmp store 
+        // hello-hex
+        // add(fmp, 0x00) says offset the address of fmp 
+        // to 0x00 hex
+        mstore(add(fmp, 0x00), 0x68656C6C6F)
+        
+        // return Hello in terms of int to data variable param
+        data := mload(add(fmp, 0x00))
+    }
+}
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## bytecode instructions
+1. on the blockchain we only deploy the execution part of the code and not the initialization part of the code
+2. the initialization instructions of our contract are as follows (instructions on the bytecode are stored on the stack, temporary data are stored in memory, and storage store persistent data) instruction are executed byte by byte: 0x 60 80 60 40 52 61 03 e8 60 00 55 34 80 15 61 00 16 57 60 00 80 fd 5b 50 60 bc 80 61 00 25 60 00 39 60 00 f3 fe
+3. get the meaning of each byte of intstruction from the ethereum yellow pages.
+- 0x60 -> push instruction i.e. push (0x80 -> word)
+- 0x60 -> push (0x40 -> free memory pointer)
+- 0x52 -> MSTORE (save word to memory) memory[0x40] = 0x80 then pop stack when pushed to 0x40, 0x80 can is now considered a free memory and can be written on
+- 61 -> place two items on stack push(0x03) and push (0xe8)
+- push (0x00)
+- 55 -> save word to storage memory[0xe8] = 0x03 
+34801561001657600080fd5b5060bc806100256000396000f3fe
+3. etc. program counter is keeping check of the instruction that we are currently on
