@@ -2,6 +2,8 @@
 - web3 - web3js api
 - @metamask/detect-provider -> utility to help detect the provider
 - @truffle/contract -> creates contract abstraction
+- ethereumjs-util
+- ethereumjs-tx - decoding our transactions
 
 # commands
 - truffle init -> used to initialize the truffle and create truffle-config.js file

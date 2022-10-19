@@ -9,6 +9,8 @@
     "@testing-library/user-event": "^13.5.0",
     "@truffle/contract": "^4.6.3",
     "bulma": "^0.9.4",
+    "ethereumjs-tx": "^2.1.2",
+    "ethereumjs-util": "^7.1.5",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
